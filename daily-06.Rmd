@@ -1,0 +1,70 @@
+---
+title: "daily-06.R"
+author: "Devina"
+date: "8/16/2020"
+output: html_document
+---
+```{r}
+```
+
+```{r, eval = FALSE}
+https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+
+url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
+
+covid = read_csv(url)
+
+```
+
+
+```{r}
+(statedata = covid %>%
+  filter(state %in% c('California', 'Florida', 'Texas', 'New York', 'Georgia', 'Illinois')) %>%
+   group_by(state, date) %>%
+   summarize(cases = sum(cases), na.rm = TRUE))
+  
+
+ggplot(data = statedata, aes(x = date, y = cases )) +
+  geom_line(aes(color = state)) +
+  geom_point(aes(color = state)) +
+  labs(title = "Cummulative Data",
+       x = "Date",
+       y = "Number of Cases",
+       caption = "Daily Exercise 06",
+       subtitle = "Data Source: NY Times",
+       color = "Top 6 States",
+       size = "cases") +
+  facet_wrap(~state) +
+  theme_minimal()
+
+  
+```
+
+```{r}
+totaldata = covid %>%
+  group_by(date) %>%
+  summarize(cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(-cases)
+
+ggplot(data = totaldata, aes(x = date, y = cases)) +
+  geom_point(aes(x = date, y = cases)) +
+  geom_col(fill = "pink", color = "pink") +
+  geom_line(color = "pink", size = 3) +
+   labs(title = "United States Cummulative Covid Data",
+        subtitle = "Data: NY Times",
+       x = "Date",
+       y = " Number of Covid Cases",
+       caption = "Daily Exercise 06") +
+    theme_minimal()
+
+ 
+  
+
+
+```
+
