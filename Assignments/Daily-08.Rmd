@@ -25,12 +25,11 @@ covid = read_csv(url)
 ```
 
 ```{r}
-install.packages("zoo")
+
 library(zoo)
-install.packages("knitr")
 library(knitr)
-install.packages("kableExtra")
 library(kableExtra)
+library(ggthemes)
 
 
 ```
@@ -42,16 +41,21 @@ covid %>%
   filter(state == state.of.interest) %>%
   group_by(date) %>%
   summarise(cases = sum(cases)) %>%
-  mutate(newCases = cases - lag(cases),
-         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %>%
+  mutate(Newcases = cases - lag(cases),
+         roll7 = rollmean(Newcases, 7, fill = NA, align="right")) %>%
 ggplot(aes(x = date)) +
-  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +
+  geom_col(aes(y = Newcases), col = NA, fill = "#F5B8B5") +
   geom_line(aes(y = roll7), col = "darkred", size = 1) +
+  ggthemes::theme_wsj() +
   labs(title = paste("New Reported Cases by Day in", state.of.interest)) +
+  labs(subtitle = "Data: NY Times") +
+  labs(caption = "Daily Exercise 08") +
+  labs(x = "Date", y = "New Cases") +
   theme(plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill = "white"),
         plot.title = element_text(size = 14, face = 'bold')) +
-  theme(aspect.ratio = .5) 
+  theme(aspect.ratio = .5) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b-%y")
           
 ```
 
@@ -59,13 +63,13 @@ ggplot(aes(x = date)) +
 dat = covid %>%
   filter(state == "California") %>%
   group_by(county) %>%
-  mutate(newCases = cases - lag(cases)) %>%
+  mutate(Newcases = cases - lag(cases)) %>%
   ungroup() %>%
   filter(date == max(date))
 
 (most_new_cases = dat %>%
-    slice_max(newCases, n = 5) %>%
-    select(county, newCases))
+    slice_max(Newcases, n = 5) %>%
+    select(county, Newcases))
 
 knitr::kable(most_new_cases, caption = "New Cases in California Counties",
              col.names = c("County", "New Cases"),
